@@ -1,47 +1,53 @@
 def main():
-    book_path = "books/frankenstein.txt" # take file
-    text = get_book_text(book_path) # use func defined below on file and store it as var
+    book_path = "books/frankenstein.txt"
+    text = get_book_text(book_path)
+    num_words = get_num_words(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
 
-    word_count = count_words(text)
-    letter_count = count_letters(text)
+    print(f"--- Begin report of {book_path} ---")
+    print(f"{num_words} words found in the document")
+    print()
 
-    print_report(book_path, word_count, letter_count)
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
+            continue
+        print(f"The '{item['char']}' character was found {item['num']} times")
 
-def count_words(text):
+    print("--- End report ---")
+
+
+def get_num_words(text):
     words = text.split()
     return len(words)
 
-def count_letters(text):
-    char_count = {}
-    lowercase = text.lower()
-    for char in lowercase:
-      if char.isalpha():
-        if char in char_count:
-          char_count[char] += 1
+
+def sort_on(d):
+    return d["num"]
+
+
+def chars_dict_to_sorted_list(num_chars_dict):
+    sorted_list = []
+    for ch in num_chars_dict:
+        sorted_list.append({"char": ch, "num": num_chars_dict[ch]})
+    sorted_list.sort(reverse=True, key=sort_on)
+    return sorted_list
+
+
+def get_chars_dict(text):
+    chars = {}
+    for c in text:
+        lowered = c.lower()
+        if lowered in chars:
+            chars[lowered] += 1
         else:
-          char_count[char] = 1
+            chars[lowered] = 1
+    return chars
 
-    # Sort dict
-    sorted_char_count = {}
-    max_value = max(char_count.values())
-    for value in range(max_value, 0, -1):
-      for key in list(char_count.keys()):
-        if char_count[key] == value:
-          sorted_char_count[key] = value
-          del char_count[key]
-
-    return sorted_char_count
 
 def get_book_text(path):
     with open(path) as f:
-      return f.read()
+        return f.read()
 
-def print_report(book_path, word_count, letter_count):
-  print(f"--- Begin report of {book_path} ---")
-  print(f"{word_count} words found in the document")
-  print(f" ")
-  for k, v in letter_count.items():
-    print(f"The '{k}' character was found {v} times")
-  print(f"--- End report ---")
 
 main()
